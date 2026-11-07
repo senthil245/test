@@ -1,0 +1,45 @@
+[agent]
+prompt_sha256 = "733c0fb9dc41468c738d03c8cb312e2f2f6df5a5f7ff48185eda38b8ce5b40f6"
+name = "data-quality"
+owner = "data-eng@example.com"
+model = "claude-haiku-5-5"
+prompt_file = "prompt.md"
+
+[params]
+max_tokens = 2048
+temperature = 0.0
+
+[[tools]]
+name = "run_sql"
+description = "Run a read-only SQL query against the warehouse and return up to 500 rows as JSON."
+[tools.input_schema]
+type = "object"
+required = ["query"]
+[tools.input_schema.properties.query]
+type = "string"
+description = "A single SELECT statement. DDL/DML is rejected."
+
+[[tools]]
+name = "open_incident"
+description = "Open a data-quality incident with the failing table, check name and sample of bad rows."
+[tools.input_schema]
+type = "object"
+required = ["table", "check", "summary"]
+[tools.input_schema.properties.table]
+type = "string"
+description = "Fully qualified table name."
+[tools.input_schema.properties.check]
+type = "string"
+description = "Name of the failed check, e.g. null_rate or freshness."
+[tools.input_schema.properties.summary]
+type = "string"
+description = "One-paragraph explanation with evidence."
+
+[evals]
+suite = "dq-anomaly-v1"
+[evals.metrics.f1]
+direction = "higher"
+max_drop = 0.03
+[evals.metrics.false_positive_rate]
+direction = "lower"
+max_increase = 0.02
