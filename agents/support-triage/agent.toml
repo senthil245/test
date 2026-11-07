@@ -1,0 +1,47 @@
+[agent]
+prompt_sha256 = "99f4bc5b41320920fac32c1ac58ffcd4979984e9c9a93bd48e5faa938973412f"
+name = "support-triage"
+owner = "team:support-platform"
+model = "claude-sonnet-5-5"
+prompt_file = "prompt.md"
+
+[params]
+max_tokens = 1024
+temperature = 0.2
+
+[[tools]]
+name = "lookup_customer"
+description = "Fetch a customer's plan, region and open ticket count by customer ID. Use before routing."
+[tools.input_schema]
+type = "object"
+required = ["customer_id"]
+[tools.input_schema.properties.customer_id]
+type = "string"
+description = "Internal customer identifier, e.g. CUST-1234."
+
+[[tools]]
+name = "route_ticket"
+description = "Assign a ticket to a queue with a priority. Call exactly once per ticket, after classification."
+[tools.input_schema]
+type = "object"
+required = ["ticket_id", "queue", "priority"]
+[tools.input_schema.properties.ticket_id]
+type = "string"
+description = "Ticket identifier."
+[tools.input_schema.properties.queue]
+type = "string"
+enum = ["billing", "technical", "account", "escalation"]
+description = "Destination queue."
+[tools.input_schema.properties.priority]
+type = "string"
+enum = ["p1", "p2", "p3"]
+description = "p1 = outage or data loss, p3 = question."
+
+[evals]
+suite = "support-triage-v1"
+[evals.metrics.routing_accuracy]
+direction = "higher"
+max_drop = 0.02
+[evals.metrics.p95_latency_s]
+direction = "lower"
+max_increase = 0.5

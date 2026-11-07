@@ -1,0 +1,28 @@
+# Model lifecycle registry — the source of truth for the model_lifecycle check.
+# Keep this in sync with your providers' deprecation pages; the entries below are
+# a starting point, not authoritative dates.
+#
+# status: active | deprecated | retired
+# retires_on: YYYY-MM-DD (optional) — agents get a WARN inside the warning window
+#             and an ERROR on/after this date.
+
+[settings]
+warn_days_before_retirement = 60
+
+[models."claude-opus-5-5"]
+status = "active"
+
+[models."claude-sonnet-5-5"]
+status = "active"
+
+[models."claude-haiku-5-5"]
+status = "active"
+
+[models."claude-fable-5-1"]
+status = "active"
+
+# Example of a model on its way out — replace with real entries.
+[models."example-legacy-model"]
+status = "deprecated"
+retires_on = "2027-01-15"
+replacement = "claude-sonnet-5-5"
